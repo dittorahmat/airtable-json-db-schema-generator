@@ -1,103 +1,113 @@
+"use client";
+
 import Image from "next/image";
+import InputArea from "@/components/InputArea";
+import ClarificationChat from "@/components/ClarificationChat";
+import DatabaseUnderstanding from "@/components/DatabaseUnderstanding";
+import WorkflowsList from "@/components/WorkflowsList";
+import AirtableJSON from "@/components/AirtableJSON";
+import { useState, useEffect } from "react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState<
+    { role: "user" | "ai"; content: string }[]
+  >([]);
+  const [databaseUnderstanding, setDatabaseUnderstanding] = useState("");
+  const [workflows, setWorkflows] = useState<{ entity: string; workflows: string[] }[]>([]);
+  const [airtableJSON, setAirtableJSON] = useState("");
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  useEffect(() => {
+    // Load API key from environment variables
+    setApiKey(process.env.NEXT_PUBLIC_GEMINI_API_KEY || null);
+  }, []);
+
+  const handleInputChange = (text: string) => {
+    setInputText(text);
+  };
+
+  const generateContent = async (prompt: string) => {
+    if (!apiKey) {
+      console.error("API key not found in environment variables.");
+      return "API key not found. Please set NEXT_PUBLIC_GEMINI_API_KEY.";
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    try {
+      const result = await model.generateContent(prompt);
+      const response = result.response;
+      return response.text();
+    } catch (error: any) {
+      console.error("Error generating content:", error);
+      return `Error generating content: ${error.message}`;
+    }
+  };
+
+  const handleGenerate = async () => {
+    // Add user input to messages
+    setMessages([...messages, { role: "user", content: inputText }]);
+
+    // Construct prompt for AI model
+    const prompt = `
+      You are a database schema generator. Analyze the following client description and generate a JSON object with the following keys:
+      1. databaseUnderstanding: A concise understanding of the database tables and relationships.
+      2. workflows: A list of workflows (sorted by table/entity) that can be demonstrated to the client.
+      3. airtableJSON: JSON for the Airtable API to create the tables & relations.  Include linked fields to represent relationships between tables (e.g., a "Teacher" field in the "Cohorts" table should be a linked field to the "Teachers" table).
+
+      Client Description:
+      ${inputText}
+
+      Return ONLY a valid JSON object, without any markdown code fences or any other additional text or conversation.
+    `;
+
+    // Generate content using the AI model
+    const aiResponse = await generateContent(prompt);
+
+    // Log the raw AI response
+    console.log("Raw AI Response:", aiResponse);
+
+    // Parse the AI response
+    try {
+      // Extract JSON from the response string
+      const jsonString = aiResponse.substring(
+        aiResponse.indexOf("{"),
+        aiResponse.lastIndexOf("}") + 1
+      );
+      const parsedResponse = JSON.parse(jsonString);
+      setDatabaseUnderstanding(parsedResponse.databaseUnderstanding);
+      setWorkflows(parsedResponse.workflows);
+      setAirtableJSON(JSON.stringify(parsedResponse.airtableJSON, null, 2));
+      setMessages([...messages, { role: "ai", content: aiResponse }]);
+    } catch (error: any) {
+      console.error("Error parsing AI response:", error);
+      setMessages([
+        ...messages,
+        {
+          role: "ai",
+          content: `Error parsing AI response: ${error}. Raw response: ${aiResponse}`,
+        },
+      ]);
+    }
+  };
+
+  return (
+    <div className="min-h-screen p-8">
+      <h1 className="text-2xl font-bold mb-4">Database Schema Generator</h1>
+      <InputArea onInputChange={handleInputChange} />
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+        onClick={handleGenerate}
+      >
+        Generate
+      </button>
+      <ClarificationChat messages={messages} />
+      <DatabaseUnderstanding understanding={databaseUnderstanding} />
+      <WorkflowsList workflows={workflows} />
+      <AirtableJSON json={airtableJSON} />
     </div>
   );
 }

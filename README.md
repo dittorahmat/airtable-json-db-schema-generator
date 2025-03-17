@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Airtable JSON DB Schema Generator
 
-## Getting Started
+This is a Next.js application that generates database schemas and workflows based on user input. It is designed to help project managers quickly design databases for clients.
 
-First, run the development server:
+### Functionality
+
+1.  **Input:** The user provides a text description of the client's business requirements.
+2.  **AI Processing:** The application uses the Gemini 2.0 Flash model to analyze the input and identify the relevant entities and relationships.
+3.  **Database Understanding:** The application displays the AI's understanding of the database tables and relationships.
+4.  **Workflows Generation:** The application generates a list of workflows for each entity, including adding, modifying, deleting, listing, and searching.
+5.  **Airtable JSON Generation:** The application generates Airtable API JSON to create the tables and relationships in Airtable, including linked fields to represent relationships between tables.
+
+### How to Use
+
+1.  Clone the repository.
+2.  Install the dependencies:
+
+```bash
+npm install
+```
+
+3.  Create a `.env` file and add your Gemini API key:
+
+```
+NEXT_PUBLIC_GEMINI_API_KEY=YOUR_API_KEY
+```
+
+4.  Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6.  Enter a description of the client's business requirements in the input area.
+7.  Click the "Generate" button.
+8.  Review the AI's understanding of the database, the generated workflows, and the Airtable API JSON.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Technology Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+*   Next.js
+*   Tailwind CSS
+*   Shadcn
+*   @google/generative-ai
 
-## Learn More
+### Deployment
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The application is deployed to Vercel.
