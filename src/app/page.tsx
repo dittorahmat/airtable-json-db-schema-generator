@@ -96,7 +96,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="text-2xl font-bold mb-4">Database Schema Generator</h1>
+      <h1 className="text-2xl font-bold mb-4">Airtable Database Schema Generator</h1>
       <InputArea onInputChange={handleInputChange} />
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"

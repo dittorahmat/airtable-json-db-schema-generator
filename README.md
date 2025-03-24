@@ -45,4 +45,29 @@ npm run dev
 
 ### Deployment
 
+
+### Deployment
+
+1.  Make sure you have a Vercel account. If not, sign up at [https://vercel.com/](https://vercel.com/).
+2.  Install the Vercel CLI globally:
+
+    ```bash
+    npm install -g vercel
+    ```
+3.  In your project directory, run:
+
+    ```bash
+    vercel login
+    ```
+
+    This will open a browser window where you can authenticate with your Vercel account.
+4.  Deploy your project by running:
+
+    ```bash
+    vercel
+    ```
+
+    Vercel CLI will ask you a few questions. Answer them accordingly.
+5.  Set the `NEXT_PUBLIC_GEMINI_API_KEY` environment variable in Vercel.
+6.  Redeploy your application for the changes to take effect.
 The application is deployed to Vercel.
