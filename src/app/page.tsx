@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import InputArea from "@/components/InputArea";
 import ClarificationChat from "@/components/ClarificationChat";
 import DatabaseUnderstanding from "@/components/DatabaseUnderstanding";
@@ -41,9 +40,9 @@ export default function Home() {
       const result = await model.generateContent(prompt);
       const response = result.response;
       return response.text();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating content:", error);
-      return `Error generating content: ${error.message}`;
+      return `Error generating content: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   };
 
@@ -82,13 +81,13 @@ export default function Home() {
       setWorkflows(parsedResponse.workflows);
       setAirtableJSON(JSON.stringify(parsedResponse.airtableJSON, null, 2));
       setMessages([...messages, { role: "ai", content: aiResponse }]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error parsing AI response:", error);
       setMessages([
         ...messages,
         {
           role: "ai",
-          content: `Error parsing AI response: ${error}. Raw response: ${aiResponse}`,
+          content: `Error parsing AI response: ${error instanceof Error ? error.message : 'Unknown error'}. Raw response: ${aiResponse}`,
         },
       ]);
     }

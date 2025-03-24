@@ -45,8 +45,7 @@ npm run dev
 
 ### Deployment
 
-
-### Deployment
+The application is deployed to Vercel and is live at: [https://db-schema-gen.vercel.app/](https://db-schema-gen.vercel.app/).
 
 1.  Make sure you have a Vercel account. If not, sign up at [https://vercel.com/](https://vercel.com/).
 2.  Install the Vercel CLI globally:
@@ -70,4 +69,3 @@ npm run dev
     Vercel CLI will ask you a few questions. Answer them accordingly.
 5.  Set the `NEXT_PUBLIC_GEMINI_API_KEY` environment variable in Vercel.
 6.  Redeploy your application for the changes to take effect.
-The application is deployed to Vercel.
